@@ -1,8 +1,27 @@
 import type { NextConfig } from "next";
 
-const scriptSrc = process.env.NODE_ENV === "development"
-  ? "script-src 'self' 'unsafe-inline' 'unsafe-eval';"
-  : "script-src 'self';";
+function buildContentSecurityPolicy() {
+  const scriptSrc = process.env.NODE_ENV === "development"
+    ? "script-src 'self' 'unsafe-inline' 'unsafe-eval';"
+    : "script-src 'self';";
+
+  return [
+    "default-src 'self';",
+    scriptSrc,
+    "script-src-attr 'none';",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
+    "img-src 'self' data: blob: https:;",
+    "font-src 'self' https://fonts.gstatic.com;",
+    "connect-src 'self' https://*.supabase.co wss://*.supabase.co;",
+    "worker-src 'self' blob:;",
+    "manifest-src 'self';",
+    "object-src 'none';",
+    "media-src 'self';",
+    "frame-ancestors 'none';",
+    "base-uri 'self';",
+    "form-action 'self';",
+  ].join(" ");
+}
 
 const nextConfig: NextConfig = {
   devIndicators: false,
@@ -29,8 +48,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: "Content-Security-Policy",
-            value:
-              `default-src 'self'; ${scriptSrc} style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-ancestors 'none'; base-uri 'self'; form-action 'self';`,
+            value: buildContentSecurityPolicy(),
           },
         ],
       },
