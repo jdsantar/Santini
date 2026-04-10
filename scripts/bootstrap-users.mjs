@@ -8,6 +8,22 @@ if (!supabaseUrl || !serviceRoleKey) {
   process.exit(1);
 }
 
+const requiredUserFields = [
+  "SANTINI_ADMIN_EMAIL",
+  "SANTINI_ADMIN_PASSWORD",
+  "SANTINI_ADMIN_NAME",
+  "SANTINI_USER_EMAIL",
+  "SANTINI_USER_PASSWORD",
+  "SANTINI_USER_NAME",
+];
+
+const missingFields = requiredUserFields.filter((field) => !process.env[field]?.trim());
+
+if (missingFields.length) {
+  console.error(`Missing required user bootstrap env vars: ${missingFields.join(", ")}`);
+  process.exit(1);
+}
+
 const supabase = createClient(supabaseUrl, serviceRoleKey, {
   auth: {
     autoRefreshToken: false,
@@ -17,15 +33,15 @@ const supabase = createClient(supabaseUrl, serviceRoleKey, {
 
 const users = [
   {
-    email: "santini@santini.app",
-    password: "1036937369",
-    displayName: "santini",
+    email: process.env.SANTINI_ADMIN_EMAIL.trim().toLowerCase(),
+    password: process.env.SANTINI_ADMIN_PASSWORD,
+    displayName: process.env.SANTINI_ADMIN_NAME.trim(),
     isAdmin: true,
   },
   {
-    email: "jose@santini.app",
-    password: "123456",
-    displayName: "Jose",
+    email: process.env.SANTINI_USER_EMAIL.trim().toLowerCase(),
+    password: process.env.SANTINI_USER_PASSWORD,
+    displayName: process.env.SANTINI_USER_NAME.trim(),
     isAdmin: false,
   },
 ];
@@ -70,5 +86,5 @@ for (const user of users) {
     throw profileError;
   }
 
-  console.log(`Ready: ${user.email} (${user.isAdmin ? "admin" : "regular"})`);
+  console.log(`Ready: ${user.displayName} (${user.isAdmin ? "admin" : "regular"})`);
 }

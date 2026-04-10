@@ -43,17 +43,25 @@ After signup, manually set `profiles.is_admin = true` in Supabase for the one tr
 
 ## Bootstrap the requested users
 
-I added [bootstrap-users.mjs](/Users/jose.santa/projects/Santini/scripts/bootstrap-users.mjs) to create these two Supabase Auth users:
+I added [bootstrap-users.mjs](/Users/jose.santa/projects/Santini/scripts/bootstrap-users.mjs) to create two initial Supabase Auth users:
 
-- `santini@santini.app` with display name `santini` and admin privileges
-- `jose@santini.app` with display name `Jose` and regular privileges
+- one admin-capable collector
+- one regular collector
 
-Supabase will hash their passwords for you; they are not stored encrypted in this app.
+The script reads emails, passwords, and display names from environment variables so sensitive account identifiers do not need to live in the repository. Supabase will hash the passwords for you; they are not stored encrypted in this app.
 
 Run it after setting your Supabase URL and service role key:
 
 ```bash
-SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... npm run bootstrap:users
+SUPABASE_URL=... \
+SUPABASE_SERVICE_ROLE_KEY=... \
+SANTINI_ADMIN_EMAIL=... \
+SANTINI_ADMIN_PASSWORD=... \
+SANTINI_ADMIN_NAME=... \
+SANTINI_USER_EMAIL=... \
+SANTINI_USER_PASSWORD=... \
+SANTINI_USER_NAME=... \
+npm run bootstrap:users
 ```
 
 ## Security notes
