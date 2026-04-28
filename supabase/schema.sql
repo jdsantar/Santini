@@ -281,6 +281,12 @@ begin
     raise exception 'Invite email is required.';
   end if;
 
+  update public.invites
+  set expires_at = timezone('utc', now())
+  where lower(email) = normalized_email
+    and accepted_at is null
+    and expires_at > timezone('utc', now());
+
   insert into public.invites (
     email,
     invite_token_hash,
@@ -336,8 +342,6 @@ begin
 
   return jsonb_build_object(
     'email', invite_row.email,
-    'invited_name', invite_row.invited_name,
-    'role', invite_row.role,
     'expires_at', invite_row.expires_at
   );
 end;

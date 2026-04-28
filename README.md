@@ -21,7 +21,7 @@ Then open [http://localhost:3000](http://localhost:3000).
 
 ## Modes
 
-- Without Supabase env vars, Santini runs in local demo mode and stores state in `localStorage`.
+- Without Supabase env vars, Santini requires auth to be configured unless you explicitly set `NEXT_PUBLIC_ENABLE_LOCAL_DEMO=true` for a local-only demo.
 - With Supabase env vars, Santini switches to shared mode with real auth, remote pack opening, shared promo codes, and multiplayer trading.
 
 ## Supabase setup

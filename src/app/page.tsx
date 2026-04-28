@@ -45,7 +45,11 @@ import {
   validateInvite,
   type RemoteAlbumSnapshot,
 } from "@/lib/santini-supabase";
-import { getSupabaseBrowserClient, isSupabaseEnabled } from "@/lib/supabase-browser";
+import {
+  getSupabaseBrowserClient,
+  isLocalDemoEnabled,
+  isSupabaseEnabled,
+} from "@/lib/supabase-browser";
 
 const STORAGE_KEY = "santini-album-state";
 const LOCAL_ACCOUNTS_KEY = "santini-local-accounts";
@@ -782,6 +786,7 @@ function buildMascotArt(themeId: ThemeId) {
 
 export default function Home() {
   const supabaseEnabled = isSupabaseEnabled();
+  const localDemoEnabled = isLocalDemoEnabled();
   const teamPages = useMemo(() => TEAM_GUIDES, []);
 
   const [localState, setLocalState] = useState<AlbumState>(defaultState);
@@ -813,7 +818,11 @@ export default function Home() {
   const [offeredCardId, setOfferedCardId] = useState("");
   const [requestedCardId, setRequestedCardId] = useState("");
   const [selectedTeamId, setSelectedTeamId] = useState(teamPages[0]?.id ?? "");
-  const [notice, setNotice] = useState("Sign in with your invited email to open the album.");
+  const [notice, setNotice] = useState(
+    supabaseEnabled || localDemoEnabled
+      ? "Sign in with your invited email to open the album."
+      : "Santini requires Supabase authentication in this environment.",
+  );
   const [revealedPack, setRevealedPack] = useState<AlbumState["lastOpenedPack"]>(null);
   const [themeId, setThemeId] = useState<ThemeId>(DEFAULT_THEME_ID);
 
@@ -1071,7 +1080,7 @@ export default function Home() {
             client,
             invite?.email ?? authEmail.trim(),
             authPassword,
-            inviteDisplayName.trim() || invite?.invited_name || authEmail.trim().split("@")[0],
+            inviteDisplayName.trim() || authEmail.trim().split("@")[0],
             inviteCode.trim(),
           );
           setAuthMode("signin");
@@ -1090,6 +1099,11 @@ export default function Home() {
         setNotice(error instanceof Error ? error.message : "Authentication failed.");
       }
 
+      return;
+    }
+
+    if (!localDemoEnabled) {
+      setNotice("Local demo access is disabled. Configure Supabase to sign in.");
       return;
     }
 
@@ -1526,22 +1540,24 @@ export default function Home() {
               <p className="section-kicker">Collector login</p>
               <h2>{authMode === "invite" ? "Accept invitation" : "Enter the album"}</h2>
             </div>
-            <div className="auth-switch">
-              <button
-                className={authMode === "signin" ? "nav-pill nav-pill-active" : "nav-pill"}
-                type="button"
-                onClick={() => setAuthMode("signin")}
-              >
-                Sign in
-              </button>
-              <button
-                className={authMode === "invite" ? "nav-pill nav-pill-active" : "nav-pill"}
-                type="button"
-                onClick={() => setAuthMode("invite")}
-              >
-                Use invite
-              </button>
-            </div>
+            {supabaseEnabled || localDemoEnabled ? (
+              <div className="auth-switch">
+                <button
+                  className={authMode === "signin" ? "nav-pill nav-pill-active" : "nav-pill"}
+                  type="button"
+                  onClick={() => setAuthMode("signin")}
+                >
+                  Sign in
+                </button>
+                <button
+                  className={authMode === "invite" ? "nav-pill nav-pill-active" : "nav-pill"}
+                  type="button"
+                  onClick={() => setAuthMode("invite")}
+                >
+                  Use invite
+                </button>
+              </div>
+            ) : null}
             <label className="field-label">
               Personal email
               <input
@@ -1580,7 +1596,11 @@ export default function Home() {
                 onChange={(event) => setAuthPassword(event.target.value)}
               />
             </label>
-            <button className="primary-button" type="submit">
+            <button
+              className="primary-button"
+              type="submit"
+              disabled={!supabaseEnabled && !localDemoEnabled}
+            >
               {authMode === "invite" ? "Create invited account" : "Open album"}
             </button>
             <p className="auth-footnote">

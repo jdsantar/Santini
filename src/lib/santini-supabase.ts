@@ -40,8 +40,6 @@ type RpcPromoCode = {
 
 type InvitePreview = {
   email: string;
-  invited_name: string | null;
-  role: "collector" | "admin";
   expires_at: string;
 };
 

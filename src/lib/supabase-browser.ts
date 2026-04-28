@@ -9,6 +9,13 @@ export function isSupabaseEnabled() {
   );
 }
 
+export function isLocalDemoEnabled() {
+  return (
+    process.env.NODE_ENV === "development" ||
+    process.env.NEXT_PUBLIC_ENABLE_LOCAL_DEMO === "true"
+  );
+}
+
 export function getSupabaseBrowserClient() {
   if (!isSupabaseEnabled()) {
     return null;
