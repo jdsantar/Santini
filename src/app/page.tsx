@@ -277,7 +277,7 @@ const DEFAULT_LOCAL_ACCOUNTS: LocalAuthAccount[] = [
     email: "collector-admin@santini.local",
     username: "santini",
     displayName: "santini",
-    passwordHash: "cb67af73d76be6860da786802fa9b6d57985805a852fc363794d780a494132db",
+    passwordHash: "12a7cff00a2d4279deddb037a9b9614e3277ea4af7d8003c1f218ae1a2c48001",
     isAdmin: true,
   },
   {
@@ -289,6 +289,8 @@ const DEFAULT_LOCAL_ACCOUNTS: LocalAuthAccount[] = [
     isAdmin: false,
   },
 ];
+
+const LEGACY_ADMIN_PASSWORD_HASH = "cb67af73d76be6860da786802fa9b6d57985805a852fc363794d780a494132db";
 
 function defaultEmailForUserId(userId: string) {
   if (userId === "admin-santini") {
@@ -316,7 +318,10 @@ function normalizeLocalAccounts(input: Partial<LocalAuthAccount>[] | null | unde
       email: account.email ?? defaultEmailForUserId(userId),
       username: account.username ?? fallback.username,
       displayName: account.displayName ?? fallback.displayName,
-      passwordHash: account.passwordHash ?? fallback.passwordHash,
+      passwordHash:
+        userId === "admin-santini" && account.passwordHash === LEGACY_ADMIN_PASSWORD_HASH
+          ? fallback.passwordHash
+          : account.passwordHash ?? fallback.passwordHash,
       isAdmin: account.isAdmin ?? fallback.isAdmin,
     };
   });

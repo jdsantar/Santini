@@ -48,7 +48,7 @@ npm run dev
 
 - Username: `santini`
   Email: `collector-admin@santini.local`
-  Password: `1036937369`
+  Password: `WC2026`
 - Username: `jose`
   Email: `collector-user@santini.local`
   Password: `123456`
