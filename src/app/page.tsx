@@ -1611,6 +1611,26 @@ export default function Home() {
             <p className="auth-footnote">
               Account creation is handled by invitation. Public sign-up is disabled.
             </p>
+            <button
+              type="button"
+              className="ghost-button"
+              style={{ marginTop: "0.5rem", width: "100%", fontSize: "0.85rem", opacity: 0.7 }}
+              onClick={async () => {
+                const client = getSupabaseBrowserClient();
+                if (client) {
+                  try {
+                    // Reemplaza estos valores con tu email y password de administrador
+                    await signInCollector(client, "admin@example.com", "mypassword123");
+                    setThemeId(DEFAULT_THEME_ID);
+                    setNotice("Welcome to the Santini album (Quick Login).");
+                  } catch (e) {
+                    setNotice(e instanceof Error ? e.message : "Quick login failed.");
+                  }
+                }
+              }}
+            >
+              Quick Login (Dev Admin)
+            </button>
             <p className="notice-line">{notice}</p>
           </form>
         </section>
